@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     # nos apps
+    'users',
+    'ai_assistant',
+    'imports',
     'core',
     'cars',
     'dashboard',
@@ -49,9 +52,11 @@ INSTALLED_APPS = [
     #nos tiers
     'rest_framework',
     'crispy_forms',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -131,3 +136,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+
+#react
+CORS_ALLOW_ALL_ORIGINS = True 
+
+#users
+AUTH_USER_MODEL = "users.User"
+
+#RESTFRAMEWORK
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+}
