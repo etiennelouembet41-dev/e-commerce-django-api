@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'crispy_forms',
     'corsheaders',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -158,6 +159,13 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
     ],
+    
+    #le drf_filter pour le filtre important pour le backend 
+    "DEFAULT_FILTER_BACKENDS": (
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ),
 }
 
 #temps de connexion et durée du refresh 
