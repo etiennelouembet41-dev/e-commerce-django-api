@@ -77,6 +77,11 @@ class Car(models.Model):
         choices=TRANSMISSION_CHOICES,
     )
     
+    fuel = models.CharField(
+    max_length=50,
+    choices=FUEL_CHOICES,
+    )
+    
     description=models.TextField()
 
     main_image=models.ImageField(
