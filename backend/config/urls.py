@@ -63,6 +63,8 @@ urlpatterns = [
     path('api/payments/', include("payments.urls")),
     
     path('api/dashboard/', include("dashboard.urls")),
+    
+    path('api/imports/', include("imports.urls")),
 ]
 
 #MEDIA_URL et MEDIA_ROOT
