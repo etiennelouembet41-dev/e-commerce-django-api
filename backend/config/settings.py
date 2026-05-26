@@ -16,6 +16,9 @@ from decouple import config
 #Pour Le JWT
 from datetime import timedelta
 
+#stripe
+import stripe
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -51,6 +54,7 @@ INSTALLED_APPS = [
     'dashboard',
     'orders',
     'addresses',
+    'payments',
     
     #nos tiers
     'rest_framework',
@@ -166,6 +170,10 @@ REST_FRAMEWORK = {
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ),
+    
+    #pagination 
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
 }
 
 #temps de connexion et durée du refresh 
@@ -173,3 +181,14 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }
+
+#MEDIA_URL et MEDIA_ROOT
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+#stripe
+STRIPE_SECRET_KEY=config('STRIPE_SECRET_KEY', default="")
+STRIPE_WEBHOOK_SECRET=config('STRIPE_WEBHOOK_SECRET', default="")
+FRONTEND_SUCCESS_URL=config('FRONTEND_SUCCESS_URL', default="http://localhost:5173/payment-success")
+FRONTEND_CANCEL_URL=config('FRONTEND_CANCEL_URL', default="http://localhost:5173/payment-cancel")
+stripe.api_key=STRIPE_SECRET_KEY

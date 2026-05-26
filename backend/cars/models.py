@@ -84,7 +84,7 @@ class Car(models.Model):
     
     description=models.TextField()
 
-    main_image=models.ImageField(
+    main_image=models.ImageField( 
         upload_to="cars/main/",
         blank=True,
         null=True,

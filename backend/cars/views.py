@@ -6,12 +6,16 @@ from rest_framework.filters import SearchFilter,OrderingFilter
 
 from .models import Car, CarImage
 from .serializers import CarSerializers,CarImageSerializers
+
+from core.permissions import IsAdminOrReadOnly
+
 # Create your views here.
 
 
 class CarViewsets(viewsets.ModelViewSet):
     queryset=Car.objects.all()
     serializer_class=CarSerializers
+    permission_classes=[IsAdminOrReadOnly]
     
     filter_backends = (
         DjangoFilterBackend,
@@ -36,7 +40,7 @@ class CarViewsets(viewsets.ModelViewSet):
         "description",
     )
     
-    ordering_fields=(
+    ordering_fields=( 
         "price",
         "year",
         "power_hp",
