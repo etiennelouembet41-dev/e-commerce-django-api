@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from orders.models import Order
 from cars.models import Car
+from ai_assistant.models import AIQuestion
 from imports.models import ImportInfo
 # Create your views here.
 
@@ -17,6 +18,26 @@ class DashboardStatsView(APIView):
     permission_classes=[IsAuthenticated]
 
     def get(self, request):
+        
+        total_ai_questions=AIQuestion.objects.count()
+
+        frequent_ai_questions=(
+            AIQuestion.objects.values("question")
+            .annotate(total=Count("id"))
+            .order_by("-total")[:10]
+        )
+        
+        most_recommended_cars=(
+            AIQuestion.objects.values(
+                "recommended_cars__brand",
+                "recommended_cars__model"
+                
+            )
+            .exclude(recommended_cars=None)
+            .annotate(total=Count("id"))
+            .order_by("-total")[:10]
+            
+        )
         
         total_revenue=(
             Order.objects.filter(payment_status="paid").aggregate(total=Sum("total_price"))
@@ -59,6 +80,10 @@ class DashboardStatsView(APIView):
                 "importing_cars":importing_cars,
                 "monthly_sales":monthly_sales,
                 "sales_by_city":sales_by_city,
+                
+                "total_ai_questions":total_ai_questions,
+                "frequent_ai_questions":frequent_ai_questions,
+                "most_recommended_cars":most_recommended_cars,
                 
             }
         )

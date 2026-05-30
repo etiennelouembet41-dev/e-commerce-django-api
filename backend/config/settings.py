@@ -192,3 +192,6 @@ STRIPE_WEBHOOK_SECRET=config('STRIPE_WEBHOOK_SECRET', default="")
 FRONTEND_SUCCESS_URL=config('FRONTEND_SUCCESS_URL', default="http://localhost:5173/payment-success")
 FRONTEND_CANCEL_URL=config('FRONTEND_CANCEL_URL', default="http://localhost:5173/payment-cancel")
 stripe.api_key=STRIPE_SECRET_KEY
+
+#IA Gemini
+GEMINI_API_KEY=config("GEMINI_API_KEY", default="")

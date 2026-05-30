@@ -65,6 +65,8 @@ urlpatterns = [
     path('api/dashboard/', include("dashboard.urls")),
     
     path('api/imports/', include("imports.urls")),
+    
+    path('api/ia/', include("ai_assistant.urls")),
 ]
 
 #MEDIA_URL et MEDIA_ROOT
