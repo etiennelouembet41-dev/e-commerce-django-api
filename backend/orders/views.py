@@ -36,6 +36,17 @@ class OrderViewsets(viewsets.ModelViewSet):
     )
 
     def get_queryset(self):
+        
+        queryset = Order.objects.select_related(
+            "user",
+            "car",
+            "delivery_city",
+            "delivery_address"
+        )
+        
+        if self.request.user.role == "admin":
+            return Order.objects.all()
+        
         return Order.objects.filter(user=self.request.user)
     
     def perform_create(self, serializer):

@@ -11,3 +11,12 @@ class IsAdminOrReadOnly(BasePermission):
             request.user.is_authenticated
             and request.user.role=="admin" #Pour POST, PUT, PATCH, DELETE, il faut être connecté et avoir le rôle admin.
         )
+        
+        
+class IsAdminUserRole(BasePermission):
+    def has_permission(self, request, view):
+        return (
+            request.user.is_authenticated
+            and request.user.role == "admin"
+        )
+        

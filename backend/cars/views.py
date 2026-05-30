@@ -13,7 +13,9 @@ from core.permissions import IsAdminOrReadOnly
 
 
 class CarViewsets(viewsets.ModelViewSet):
-    queryset=Car.objects.all()
+    queryset = Car.objects.select_related(
+        "origin_country"
+    ).all()
     serializer_class=CarSerializers
     permission_classes=[IsAdminOrReadOnly]
     

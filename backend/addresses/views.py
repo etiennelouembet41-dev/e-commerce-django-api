@@ -12,6 +12,15 @@ class AddressViewsets(viewsets.ModelViewSet):
     permission_classes=[IsAuthenticated]
     
     def get_queryset(self):
+        
+        queryset = Address.objects.select_related(
+            "user",
+            "city"
+        )
+        
+        if self.request.user.role == "admin":
+            return Address.objects.all()
+        
         return Address.objects.filter(user=self.request.user)#retourne unique les addresses des utilisateurs connectés très important 
     
     def perform_create(self, serializer):

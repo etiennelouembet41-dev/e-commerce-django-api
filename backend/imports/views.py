@@ -12,11 +12,16 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from orders.models import Order
+
+from core.permissions import IsAdminUserRole
 # Create your views here.
 
 class ImportInfoViewsets(viewsets.ModelViewSet):
-    queryset=ImportInfo.objects.all()
+    queryset = ImportInfo.objects.select_related(
+        "car"
+    ).all()
     serializer_class=ImportInfoSerializers
+    permission_classes = [IsAdminUserRole]
     
     filterset_fields = (
         "status",

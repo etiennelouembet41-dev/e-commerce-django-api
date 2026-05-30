@@ -6,12 +6,15 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from .models import User
 from .serializers import UserSerializes,RegisterSerializer
 
+from core.permissions import IsAdminUserRole
+
 # Create your views here.
 
 
 class UserViewsets(viewsets.ModelViewSet):
     queryset=User.objects.all()
     serializer_class=UserSerializes
+    permission_classes=[IsAdminUserRole]
     
 class RegisterView(generics.CreateAPIView):
     serializer_class=RegisterSerializer
