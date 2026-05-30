@@ -12,6 +12,8 @@ from rest_framework import status
 
 from orders.models import Order
 
+from core.emails import send_payment_success_email
+
 
 # Create your views here.
 
@@ -51,7 +53,7 @@ class CreateCheckoutSessionView(APIView):
                     "price_data":{
                         "currency":"myr",
                         "product_data":{
-                            "name":f"{order.card.brand} {order.card.model}",
+                            "name":f"{order.car.brand} {order.card.model}",
                         },
                         
                         "unit_amount":amount_cents,
@@ -104,6 +106,8 @@ def stripe_webhook(request):#c'est la partie la plus important "Le paiement a r√
                 order.car.save()
 
                 order.save()
+                
+                send_payment_success_email(order)
             
             except Order.DoesNotExist:
                 pass

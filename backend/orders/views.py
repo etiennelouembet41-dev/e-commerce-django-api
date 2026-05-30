@@ -7,7 +7,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter,OrderingFilter
 
 from .models import Order,OrderItem
-from .serializers import OrderSerializers,OrderItemSerializers
+from .serializers import OrderSerializers,OrderItemSerializers, OrderDetailSerializer
+
+from core.emails import send_order_confirmation_email
 # Create your views here.
 
 class OrderViewsets(viewsets.ModelViewSet):
@@ -37,7 +39,33 @@ class OrderViewsets(viewsets.ModelViewSet):
         return Order.objects.filter(user=self.request.user)
     
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        #serializer.save(user=self.request.user) on modifie suite aux mails ajouté 
+        car=serializer.validated_data["car"]
+        delivery_city=serializer.validated_data["delivery_city"]
+
+        import_info=getattr(car, "import_info", None)
+
+        car_price=car.price
+        import_fees=import_info.estimated_import_cost if import_info else 0
+        delivery_fees=delivery_city.delivery_price
+        
+        total_price=car_price+import_fees+delivery_fees
+
+        order=serializer.save(
+               user=self.request.user,
+               car_price=car_price,
+               import_fees=import_fees,
+               delivery_fees=delivery_fees,
+               total_price=total_price, 
+            )
+        
+        send_order_confirmation_email(order)
+    
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return OrderDetailSerializer
+        return OrderSerializers
+        
         
 class OrderItemViewsets(viewsets.ModelViewSet):
     serializer_class=OrderItemSerializers
@@ -45,3 +73,4 @@ class OrderItemViewsets(viewsets.ModelViewSet):
     
     def get_queryset(self):
         return OrderItem.objects.filter(orders__user=self.request.user)
+    
