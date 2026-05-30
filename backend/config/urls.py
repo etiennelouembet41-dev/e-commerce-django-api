@@ -26,7 +26,7 @@ from rest_framework.routers import DefaultRouter
 from users.views import UserViewsets,RegisterView,ProfileView
 from addresses.views import AddressViewsets
 from cars.views import CarViewsets,CarImageViewsets
-from core.views import OriginCountryViewsets,MalaisianCityViewsets
+from core.views import OriginCountryViewsets,MalaisianCityViewsets,NotificationViewSet
 from imports.views import ImportInfoViewsets
 from orders.views import OrderViewsets,OrderItemViewsets
 
@@ -41,6 +41,7 @@ router.register(r'core_malaisian',MalaisianCityViewsets)
 router.register(r'imports',ImportInfoViewsets)
 router.register(r'orders_order',OrderViewsets, basename='order')
 router.register(r'orders_orderitem',OrderItemViewsets,basename='orderitem')
+router.register(r'notifications', NotificationViewSet, basename='notifications')
 
 #pour fournir les endpoints d'authentification JWT de Django REST Framework SimpleJWT
 from rest_framework_simplejwt.views import (

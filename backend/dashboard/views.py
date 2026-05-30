@@ -1,16 +1,19 @@
 from django.shortcuts import render
 
-from django.db.models import Sum,Count
+from django.db.models import Sum,Count,Avg, CharField
 from django.db.models.functions import TruncMonth
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
 
 from orders.models import Order
 from cars.models import Car
 from ai_assistant.models import AIQuestion
 from imports.models import ImportInfo
+
+from django.db.models.functions import Cast
 # Create your views here.
 
 
@@ -21,10 +24,12 @@ class DashboardStatsView(APIView):
         
         total_ai_questions=AIQuestion.objects.count()
 
-        frequent_ai_questions=(
-            AIQuestion.objects.values("question")
+        frequent_ai_questions = (
+            AIQuestion.objects
+            .annotate(question_text=Cast("question", CharField(max_length=255)))
+            .values("question_text")
             .annotate(total=Count("id"))
-            .order_by("-total")[:10]
+            .order_by("-total")[:5]
         )
         
         most_recommended_cars=(
@@ -71,6 +76,31 @@ class DashboardStatsView(APIView):
                 .order_by("-total")
         )
         
+        #dashboard avancé
+        payments_received=(
+            Order.objects.filter(payment_status__in=["paid", "deposit_paid"])
+            .aggregate(total=Sum("total_price"))
+        )
+        
+        sales_by_origin_country=(
+            Order.objects.values("car__origin_country__name")
+            .annotate(total_orders=Count("id"), revenue=Sum("total_price"))
+            .order_by("-total_orders")
+        )
+        
+        sales_by_race_type=(
+            Order.objects.values("car__race_type")
+            .annotate(total_orders=Count("id"), revenue=Sum("total_price"))
+            .order_by("-total_orders")
+        )
+        
+        top_selling_cars=(
+            Order.objects.values("car__brand", "car__model")
+            .annotate(total_orders=Count("id"), revenue=Sum("total_price"))
+            .order_by("-total_orders")[:10]
+            
+        )
+        
         return Response(
             {
                 "total_revenue":total_revenue,
@@ -85,5 +115,22 @@ class DashboardStatsView(APIView):
                 "frequent_ai_questions":frequent_ai_questions,
                 "most_recommended_cars":most_recommended_cars,
                 
+                "payments_received":payments_received,
+                "sales_by_origin_country":sales_by_origin_country,
+                "sales_by_race_type":sales_by_race_type,
+                "top_selling_cars":top_selling_cars,
+                
+                
+                
+                
             }
         )
+        
+@action(detail=True, methods=["post"], url_path="mark-as-read")
+def mark_as_read(self, request, pk=None):
+    notification = self.get_object()
+    notification.is_read = True
+    notification.save()
+    return Response({
+        "message": "Notification marked as read"
+    })
