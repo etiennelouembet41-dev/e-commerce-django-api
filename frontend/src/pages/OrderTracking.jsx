@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { CheckCircle, Circle, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import api from "../api/axios";
+import ImportTimeline from "../components/ImportTimeline";
+import Loader from "../components/Loader";
 
 export default function OrderTracking() {
   const [searchParams] = useSearchParams();
@@ -11,7 +13,22 @@ export default function OrderTracking() {
   const [tracking, setTracking] = useState(null);
   const [error, setError] = useState("");
 
+  const [loading, setLoading] = useState(false);
+
   const fetchTracking = async (customOrderId = orderId) => {
+
+    setLoading(true);
+
+    try {
+      const res = await api.get(`/imports/tracking/${customOrderId}/`);
+      setTracking(res.data);
+    } catch {
+      setError("Commande introuvable ou accès non autorisé.");
+    } finally {
+      setLoading(false);
+    }
+
+
     if (!customOrderId) return;
 
     setError("");
@@ -59,6 +76,8 @@ export default function OrderTracking() {
         </div>
       )}
 
+      {loading && <Loader />}
+
       {tracking && (
         <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-8">
           <p className="text-sm text-gray-400">Commande #{tracking.order_id}</p>
@@ -69,32 +88,8 @@ export default function OrderTracking() {
             Livraison : {tracking.delivery_city}
           </p>
 
-          <div className="mt-8 space-y-5">
-            {tracking.timeline.map((step) => (
-              <div key={step.status} className="flex items-center gap-4">
-                {step.completed ? (
-                  <CheckCircle className="text-green-500" />
-                ) : (
-                  <Circle className="text-gray-500" />
-                )}
-
-                <div>
-                  <p
-                    className={
-                      step.current
-                        ? "font-bold text-red-500"
-                        : "font-semibold text-gray-300"
-                    }
-                  >
-                    {step.status}
-                  </p>
-
-                  {step.current && (
-                    <p className="text-sm text-gray-400">Étape actuelle</p>
-                  )}
-                </div>
-              </div>
-            ))}
+          <div className="mt-8">
+            <ImportTimeline timeline={tracking.timeline} />
           </div>
 
           <p className="mt-8 text-gray-400">

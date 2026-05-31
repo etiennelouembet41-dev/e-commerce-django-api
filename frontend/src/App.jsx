@@ -17,6 +17,9 @@ import Notifications from "./pages/Notifications";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Addresses from "./pages/Addresses";
 import Orders from "./pages/Orders";
+import OrderDetail from "./pages/OrderDetail";
+import NotFound from "./pages/NotFound";
+import Footer from "./components/Footer";
 
 
 export default function App() {
@@ -45,9 +48,14 @@ export default function App() {
         <Route path="/dashboard" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>}/>
         <Route path="/addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>}/>
         <Route path="/orders"element={<ProtectedRoute><Orders /></ProtectedRoute>}/>
+        <Route path="/orders/:id"element={<ProtectedRoute><OrderDetail /></ProtectedRoute>}/>
+        <Route path="*" element={<NotFound />} />
+        
 
 
       </Routes>
+
+      <Footer />
         
     </div>
   );

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { CreditCard, MapPin, PackageSearch } from "lucide-react";
 import api from "../api/axios";
+import StatusBadge from "../components/StatusBadge";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
@@ -45,8 +46,8 @@ export default function Orders() {
                 </h2>
 
                 <div className="mt-4 flex flex-wrap gap-3">
-                  <Badge value={order.status} />
-                  <Badge value={order.payment_status} />
+                  <StatusBadge  value={order.status} />
+                  <StatusBadge  value={order.payment_status} />
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-5 text-gray-400">
@@ -85,6 +86,13 @@ export default function Orders() {
                 >
                   Suivre import
                 </Link>
+
+                <Link
+                    to={`/orders/${order.id}`}
+                    className="rounded-2xl border border-white/10 px-5 py-3 text-center font-bold transition hover:bg-white/10"
+                >
+                    Détails
+                </Link>
               </div>
             </div>
           </div>
@@ -100,24 +108,3 @@ export default function Orders() {
   );
 }
 
-function Badge({ value }) {
-  const colors = {
-    unpaid: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-    deposit_paid: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    paid: "bg-green-500/10 text-green-400 border-green-500/20",
-    confirmed: "bg-green-500/10 text-green-400 border-green-500/20",
-    pending: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-    cancelled: "bg-red-500/10 text-red-400 border-red-500/20",
-    completed: "bg-green-500/10 text-green-400 border-green-500/20",
-  };
-
-  return (
-    <span
-      className={`rounded-full border px-3 py-1 text-sm font-bold ${
-        colors[value] || "border-white/10 bg-white/5 text-gray-300"
-      }`}
-    >
-      {value}
-    </span>
-  );
-}
