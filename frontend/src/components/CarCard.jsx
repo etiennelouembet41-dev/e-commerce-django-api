@@ -1,12 +1,15 @@
 import { Link } from "react-router-dom";
 import { Gauge, MapPin, Zap } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function CarCard({ car }) {
   return (
-    <Link
-      to={`/cars/${car.id}`}
-      className="group overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-xl transition hover:-translate-y-1 hover:bg-white/10"
-    >
+    <motion.div initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+      <Link
+        to={`/cars/${car.id}`}
+        className="group block overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-xl transition hover:-translate-y-1 hover:bg-white/10"
+      >
+
       <div className="h-56 overflow-hidden bg-neutral-900">
         {car.main_image ? (
           <img
@@ -45,5 +48,6 @@ export default function CarCard({ car }) {
         </div>
       </div>
     </Link>
+  </motion.div>
   );
 }

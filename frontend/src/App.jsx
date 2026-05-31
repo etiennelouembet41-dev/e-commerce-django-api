@@ -11,6 +11,13 @@ import Assistant from "./pages/Assistant";
 import OrderTracking from "./pages/OrderTracking";
 import AdminDashboard from "./pages/AdminDashboard";
 import Checkout from "./pages/Checkout";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentCancel from "./pages/PaymentCancel";
+import Notifications from "./pages/Notifications";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Addresses from "./pages/Addresses";
+import Orders from "./pages/Orders";
+
 
 export default function App() {
   return (
@@ -28,7 +35,20 @@ export default function App() {
         <Route path="/tracking" element={<OrderTracking />} />
         <Route path="/dashboard" element={<AdminDashboard />} />
         <Route path="/checkout/:carId" element={<Checkout />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/payment-cancel" element={<PaymentCancel />} />  
+        <Route path="/notifications"  element={<Notifications />} />
+        <Route path="/profile" element={<ProtectedRoute> <Profile /></ProtectedRoute>}/>
+        <Route path="/checkout/:carId" element={<ProtectedRoute><Checkout /></ProtectedRoute>}/>
+        <Route path="/tracking" element={<ProtectedRoute><OrderTracking /></ProtectedRoute>}/>
+        <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>}/>
+        <Route path="/dashboard" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>}/>
+        <Route path="/addresses" element={<ProtectedRoute><Addresses /></ProtectedRoute>}/>
+        <Route path="/orders"element={<ProtectedRoute><Orders /></ProtectedRoute>}/>
+
+
       </Routes>
+        
     </div>
   );
 }

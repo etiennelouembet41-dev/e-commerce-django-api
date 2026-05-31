@@ -1,6 +1,7 @@
 import { Link, NavLink } from "react-router-dom";
 import { Car, User, LogOut } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { Bell } from "lucide-react";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -22,6 +23,9 @@ export default function Navbar() {
           <NavLink to="/assistant" className={linkClass}>Assistant IA</NavLink>
           <NavLink to="/tracking" className={linkClass}>Suivi</NavLink>
           <NavLink to="/dashboard" className={linkClass}>Dashboard</NavLink>
+          <NavLink to="/notifications" className={linkClass}> <Bell size={18} /> </NavLink>
+          <NavLink to="/addresses" className={linkClass}> Adresses</NavLink>
+          <NavLink to="/orders" className={linkClass}>Commandes</NavLink>
         </div>
 
         <div className="flex items-center gap-4">
