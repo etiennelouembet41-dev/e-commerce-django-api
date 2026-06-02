@@ -20,6 +20,8 @@ import Orders from "./pages/Orders";
 import OrderDetail from "./pages/OrderDetail";
 import NotFound from "./pages/NotFound";
 import Footer from "./components/Footer";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 
 export default function App() {
@@ -50,6 +52,8 @@ export default function App() {
         <Route path="/orders"element={<ProtectedRoute><Orders /></ProtectedRoute>}/>
         <Route path="/orders/:id"element={<ProtectedRoute><OrderDetail /></ProtectedRoute>}/>
         <Route path="*" element={<NotFound />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         
 
 

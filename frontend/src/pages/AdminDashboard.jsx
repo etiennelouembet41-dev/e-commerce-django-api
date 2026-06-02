@@ -38,7 +38,7 @@ export default function AdminDashboard() {
       </p>
 
       <h1 className="mt-2 text-4xl font-black">
-        Dashboard Le Vikings Cars
+        Dashboard Le_Vikings_Cars
       </h1>
 
       <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">

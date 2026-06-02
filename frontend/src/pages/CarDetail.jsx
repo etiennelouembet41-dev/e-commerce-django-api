@@ -81,8 +81,8 @@ export default function CarDetail() {
             <Info icon={<Gauge />} label="Kilométrage" value={`${car.mileage} km`} />
             <Info icon={<Settings />} label="Transmission" value={car.transmission} />
             <Info icon={<Fuel />} label="Carburant" value={car.fuel} />
-            <Info icon={<MapPin />} label="Pays origine" value={`#${car.origin_country}`} />
-            <Info label="État" value={car.condition} />
+            <Info icon={<MapPin />} label="Pays origine" value={`${car.origin_country_name}`} />
+            <Info label="État" value={car.conditions} />
           </div>
 
           <div className="mt-8">
@@ -96,7 +96,7 @@ export default function CarDetail() {
           >
             Commander cette voiture
           </button>
-          
+
         </div>
       </div>
     </section>

@@ -18,7 +18,7 @@ export default function Checkout() {
 
   useEffect(() => {
     api.get(`/cars/${carId}/`).then((res) => setCar(res.data));
-    api.get("/cities/").then((res) => setCities(res.data.results || res.data));
+    api.get("/core_malaisian/").then((res) => setCities(res.data.results || res.data));
     api.get("/addresses/").then((res) => setAddresses(res.data.results || res.data));
   }, [carId]);
 
@@ -27,25 +27,29 @@ export default function Checkout() {
     setError("");
 
     try {
-      const orderRes = await api.post("/orders/", {
-        car: carId,
-        delivery_city: deliveryCity,
-        delivery_address: deliveryAddress,
+      const orderRes = await api.post("/orders_order/", {
+        car: Number(carId),
+        delivery_city: Number(deliveryCity),
+        delivery_address: Number(deliveryAddress),
         status: "pending",
       });
 
-      const paymentRes = await api.post("/payments/create-checkout-session/", {
+      const paymentRes = await api.post("/payments/create_checkout_session/", {
         order_id: orderRes.data.id,
         payment_type: paymentType,
       });
 
       window.location.href = paymentRes.data.checkout_url;
-    } catch {
-      setError("Impossible de créer la commande ou le paiement.");
+    
+    } catch (err) {
+        const message = JSON.stringify(err.response?.data || err.message, null, 2);
+
+        alert(message);
+        setError(message);
     } finally {
-      setLoading(false);
+    setLoading(false);
     }
-  };
+    };
 
   if (!car) return <div className="p-6 text-gray-400">Chargement...</div>;
 
@@ -80,7 +84,7 @@ export default function Checkout() {
               <option value="">Choisir une ville</option>
               {cities.map((city) => (
                 <option key={city.id} value={city.id}>
-                  {city.name} - {city.delivery_price} MYR
+                   {city.name} - {city.delivery_price} MYR
                 </option>
               ))}
             </select>

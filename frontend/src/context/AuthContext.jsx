@@ -2,9 +2,14 @@ import { createContext, useState, useEffect, useContext } from "react";
 import api from "../api/axios";
 
 
+
+
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
+
+  const [authLoading, setAuthLoading] = useState(true);
+
   const [user, setUser] = useState(null);
 
   const login = async (email, password) => {
@@ -35,12 +40,16 @@ export function AuthProvider({ children }) {
           localStorage.removeItem("access");
           localStorage.removeItem("refresh");
           setUser(null);
-        });
+        })
+        .finally(() => setAuthLoading(false));
+    }
+    else {
+      setAuthLoading(false);
     }
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, authLoading }}>
       {children}
     </AuthContext.Provider>
   );

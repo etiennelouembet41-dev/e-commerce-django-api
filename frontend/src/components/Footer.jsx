@@ -1,10 +1,6 @@
 import { Link } from "react-router-dom";
-import {
-  Car,
-  Mail,
-  Phone,
-  MapPin,
-} from "lucide-react";
+import { Car, Mail, Phone, MapPin,} from "lucide-react";
+import logo from "../assets/logo.png";
 
 export default function Footer() {
   return (
@@ -13,9 +9,9 @@ export default function Footer() {
         <div className="grid gap-10 md:grid-cols-4">
           <div>
             <div className="flex items-center gap-2">
-              <Car className="text-red-500" />
+              <img src={logo} alt="Le Vikings Cars" className="h-10 w-auto"/>
               <span className="text-xl font-black">
-                Le Vikings Cars
+                Le_Vikings_Cars
               </span>
             </div>
 
@@ -70,7 +66,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 border-t border-white/10 pt-6 text-center text-sm text-gray-500">
-          © {new Date().getFullYear()} Le Vikings Cars.
+          © {new Date().getFullYear()} Le_Vikings_Cars.
           Tous droits réservés.
         </div>
       </div>

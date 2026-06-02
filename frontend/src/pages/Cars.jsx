@@ -55,14 +55,26 @@ export default function Cars() {
           <select
             value={raceType}
             onChange={(e) => setRaceType(e.target.value)}
-            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-red-500"
+            className="rounded-2xl border border-white/10 bg-black text-white px-4 py-3 outline-none focus:border-red-500"
           >
-            <option value="">Tous types</option>
-            <option value="circuit">Circuit</option>
-            <option value="drift">Drift</option>
-            <option value="rally">Rallye</option>
-            <option value="drag">Drag Race</option>
-            <option value="amateur">Compétition amateur</option>
+            <option value="" className="bg-black text-white">
+              Tous types
+            </option>
+            <option value="circuit" className="bg-black text-white">
+              Circuit
+            </option>
+            <option value="drift" className="bg-black text-white">
+              Drift
+            </option>
+            <option value="rally" className="bg-black text-white">
+              Rallye
+            </option>
+            <option value="drag" className="bg-black text-white">
+              Drag Race
+            </option>
+            <option value="amateur" className="bg-black text-white">
+              Compétition amateur
+            </option>
           </select>
 
           <button

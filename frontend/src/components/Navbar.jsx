@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { Bell, Car, LogOut, Menu, User, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import logo from "../assets/logo.png";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -16,8 +17,8 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 border-b border-white/10 bg-black/80 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link to="/" onClick={closeMenu} className="flex items-center gap-2 text-xl font-bold">
-          <Car className="text-red-500" />
-          Le Vikings Cars
+          <img src={logo} alt="Le Vikings Cars" className="h-10 w-auto"/>
+          Le_Vikings_Cars
         </Link>
 
         <div className="hidden items-center gap-6 lg:flex">
@@ -36,8 +37,10 @@ export default function Navbar() {
             </>
           )}
 
-          {user?.role === "admin" && (
-            <NavLink to="/dashboard" className={linkClass}>Dashboard</NavLink>
+          {(user?.is_staff || user?.is_superuser) && (
+            <NavLink to="/dashboard" className={linkClass}>
+              Dashboard
+            </NavLink>
           )}
         </div>
 

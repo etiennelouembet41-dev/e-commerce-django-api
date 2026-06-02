@@ -9,7 +9,7 @@ export default function Orders() {
 
   const payOrder = async (orderId, paymentType = "deposit") => {
     try {
-      const res = await api.post("/payments/create-checkout-session/", {
+      const res = await api.post("/payments/create_checkout_session/", {
         order_id: orderId,
         payment_type: paymentType,
       });
@@ -21,7 +21,7 @@ export default function Orders() {
   };
 
   useEffect(() => {
-    api.get("/orders/").then((res) => {
+    api.get("/orders_order/").then((res) => {
       setOrders(res.data.results || res.data);
     });
   }, []);

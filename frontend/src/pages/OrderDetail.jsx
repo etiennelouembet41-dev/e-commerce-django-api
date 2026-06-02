@@ -10,11 +10,11 @@ export default function OrderDetail() {
   const [order, setOrder] = useState(null);
 
   useEffect(() => {
-    api.get(`/orders/${id}/`).then((res) => setOrder(res.data));
+    api.get(`/orders_order/${id}/`).then((res) => setOrder(res.data));
   }, [id]);
 
   const payOrder = async () => {
-    const res = await api.post("/payments/create-checkout-session/", {
+    const res = await api.post("/payments/create_checkout_session/", {
       order_id: order.id,
       payment_type: "deposit",
     });
@@ -101,7 +101,7 @@ export default function OrderDetail() {
           <div className="mt-6 border-t border-white/10 pt-6">
             <div className="flex justify-between text-2xl font-black">
               <span>Total</span>
-              <span>{Number(order.total_price || 0).toLocaleString()} MYR</span>
+              <span>{Number(order.total_price || 0).toLocaleString()} $</span>
             </div>
           </div>
         </div>
@@ -128,7 +128,7 @@ function PriceRow({ label, value }) {
     <div className="mt-5 flex justify-between text-gray-300">
       <span>{label}</span>
       <span className="font-bold">
-        {Number(value || 0).toLocaleString()} MYR
+        {Number(value || 0).toLocaleString()} $
       </span>
     </div>
   );

@@ -14,7 +14,7 @@ export default function Addresses() {
 
   const fetchData = async () => {
     const addressRes = await api.get("/addresses/");
-    const cityRes = await api.get("/cities/");
+    const cityRes = await api.get("/core_malaisian/");
 
     setAddresses(addressRes.data.results || addressRes.data);
     setCities(cityRes.data.results || cityRes.data);
@@ -27,17 +27,31 @@ export default function Addresses() {
   const createAddress = async (e) => {
     e.preventDefault();
 
-    await api.post("/addresses/", form);
+    try {
+        const payload = {
+         city: Number(form.city),
+         address_line: form.address_line,
+         postal_code: form.postal_code,
+         is_default: form.is_default,
+        };
 
-    setForm({
-      city: "",
-      address_line: "",
-      postal_code: "",
-      is_default: false,
-    });
+        console.log("Payload envoyé :", payload);
 
-    fetchData();
-  };
+        await api.post("/addresses/", payload);
+
+        setForm({
+         city: "",
+         address_line: "",
+         postal_code: "",
+         is_default: false,
+        });
+
+        fetchData();
+    } catch (error) {
+        console.log("Erreur backend :", error.response?.data);
+        alert(JSON.stringify(error.response?.data));
+    }
+    };
 
   return (
     <section className="mx-auto max-w-5xl px-6 py-12">

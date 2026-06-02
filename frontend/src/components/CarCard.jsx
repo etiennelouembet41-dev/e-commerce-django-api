@@ -43,7 +43,7 @@ export default function CarCard({ car }) {
             <Gauge size={16} /> {car.mileage} km
           </span>
           <span className="flex items-center gap-1">
-            <MapPin size={16} /> #{car.origin_country}
+            <MapPin size={16} /> #{car.origin_country_name}
           </span>
         </div>
       </div>

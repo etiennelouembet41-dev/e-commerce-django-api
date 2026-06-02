@@ -58,6 +58,12 @@ export default function Login() {
           className="mt-4 w-full rounded-2xl border border-white/10 bg-black px-4 py-3 outline-none focus:border-red-500"
         />
 
+        <div className="mt-3 text-right">
+          <Link to="/forgot-password" className="text-sm text-red-500 hover:underline">
+            Mot de passe oublié ?
+          </Link>
+        </div>
+
         <button className="mt-6 w-full rounded-2xl bg-red-600 py-4 font-black hover:bg-red-700">
           Se connecter
         </button>

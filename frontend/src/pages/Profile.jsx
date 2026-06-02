@@ -9,6 +9,14 @@ export default function Profile() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
 
+  const [passwordForm, setPasswordForm] = useState({
+    old_password: "",
+    new_password: "",
+  });
+
+  const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -33,6 +41,7 @@ export default function Profile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaved(false);
+    setError("");
 
     try {
       const res = await api.patch("/auth/profile/", form);
@@ -44,12 +53,31 @@ export default function Profile() {
     }
   };
 
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+
+    setPasswordSuccess("");
+    setPasswordError("");
+
+    try {
+      await api.post("/auth/change-password/", passwordForm);
+
+      setPasswordSuccess("Mot de passe modifié avec succès.");
+      setPasswordForm({
+        old_password: "",
+        new_password: "",
+      });
+    } catch (err) {
+      console.log("CHANGE PASSWORD ERROR:", err.response?.data);
+      setPasswordError(
+        err.response?.data?.error ||
+          "Impossible de modifier le mot de passe."
+      );
+    }
+  };
+
   if (error) {
-    return (
-      <div className="p-6 text-red-400">
-        {error}
-      </div>
-    );
+    return <div className="p-6 text-red-400">{error}</div>;
   }
 
   if (!form) {
@@ -90,7 +118,9 @@ export default function Profile() {
 
           <input
             value={form.phone_number || ""}
-            onChange={(e) => setForm({ ...form, phone_number: e.target.value })}
+            onChange={(e) =>
+              setForm({ ...form, phone_number: e.target.value })
+            }
             placeholder="Téléphone"
             className="rounded-2xl border border-white/10 bg-black px-4 py-3 outline-none focus:border-red-500"
           />
@@ -104,6 +134,54 @@ export default function Profile() {
 
           <button className="rounded-2xl bg-red-600 py-4 font-black hover:bg-red-700">
             Enregistrer
+          </button>
+        </form>
+      </div>
+
+      <div className="mt-8 rounded-3xl border border-white/10 bg-white/5 p-8">
+        <h2 className="text-2xl font-black">Changer le mot de passe</h2>
+
+        {passwordSuccess && (
+          <div className="mt-5 rounded-xl bg-green-500/10 p-3 text-green-400">
+            {passwordSuccess}
+          </div>
+        )}
+
+        {passwordError && (
+          <div className="mt-5 rounded-xl bg-red-500/10 p-3 text-red-400">
+            {passwordError}
+          </div>
+        )}
+
+        <form onSubmit={handlePasswordChange} className="mt-8 grid gap-4">
+          <input
+            type="password"
+            value={passwordForm.old_password}
+            onChange={(e) =>
+              setPasswordForm({
+                ...passwordForm,
+                old_password: e.target.value,
+              })
+            }
+            placeholder="Ancien mot de passe"
+            className="rounded-2xl border border-white/10 bg-black px-4 py-3 outline-none focus:border-red-500"
+          />
+
+          <input
+            type="password"
+            value={passwordForm.new_password}
+            onChange={(e) =>
+              setPasswordForm({
+                ...passwordForm,
+                new_password: e.target.value,
+              })
+            }
+            placeholder="Nouveau mot de passe"
+            className="rounded-2xl border border-white/10 bg-black px-4 py-3 outline-none focus:border-red-500"
+          />
+
+          <button className="rounded-2xl bg-red-600 py-4 font-black hover:bg-red-700">
+            Modifier le mot de passe
           </button>
         </form>
       </div>

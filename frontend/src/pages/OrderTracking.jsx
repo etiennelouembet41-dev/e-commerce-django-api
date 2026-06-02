@@ -12,33 +12,26 @@ export default function OrderTracking() {
   const [orderId, setOrderId] = useState(initialOrderId);
   const [tracking, setTracking] = useState(null);
   const [error, setError] = useState("");
-
   const [loading, setLoading] = useState(false);
 
   const fetchTracking = async (customOrderId = orderId) => {
-
-    setLoading(true);
-
-    try {
-      const res = await api.get(`/imports/tracking/${customOrderId}/`);
-      setTracking(res.data);
-    } catch {
-      setError("Commande introuvable ou accès non autorisé.");
-    } finally {
-      setLoading(false);
+    if (!customOrderId) {
+      setError("Veuillez entrer un numéro de commande.");
+      return;
     }
 
-
-    if (!customOrderId) return;
-
+    setLoading(true);
     setError("");
     setTracking(null);
 
     try {
       const res = await api.get(`/imports/tracking/${customOrderId}/`);
       setTracking(res.data);
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError("Commande introuvable ou accès non autorisé.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -78,7 +71,13 @@ export default function OrderTracking() {
 
       {loading && <Loader />}
 
-      {tracking && (
+      {!tracking && !error && !loading && (
+        <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-8 text-gray-400">
+          Entrez votre numéro de commande pour voir le suivi d’importation.
+        </div>
+      )}
+
+      {tracking && !loading && (
         <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-8">
           <p className="text-sm text-gray-400">Commande #{tracking.order_id}</p>
 
