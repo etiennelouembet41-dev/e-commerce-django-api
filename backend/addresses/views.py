@@ -4,11 +4,11 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Address
-from .serializers import AddressSerializers
+from .serializers import AddressSerializer
 # Create your views here.
 
 class AddressViewsets(viewsets.ModelViewSet):
-    serializer_class=AddressSerializers
+    serializer_class=AddressSerializer
     permission_classes=[IsAuthenticated]
     
     def get_queryset(self):

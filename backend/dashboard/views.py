@@ -5,7 +5,7 @@ from django.db.models.functions import TruncMonth
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser
 from rest_framework.decorators import action
 
 from orders.models import Order
@@ -18,7 +18,7 @@ from django.db.models.functions import Cast
 
 
 class DashboardStatsView(APIView):
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAdminUser]
 
     def get(self, request):
         
@@ -33,7 +33,7 @@ class DashboardStatsView(APIView):
         )
         
         most_recommended_cars=(
-            AIQuestion.objects.values(
+            AIQuestion.objects.values( 
                 "recommended_cars__brand",
                 "recommended_cars__model"
                 
@@ -71,7 +71,7 @@ class DashboardStatsView(APIView):
         )
         
         sales_by_city=(
-            Order.objects.values("delivery_city__city__name") 
+            Order.objects.values("delivery_city__name")
                 .annotate(total=Count("id"))
                 .order_by("-total")
         )
@@ -126,11 +126,3 @@ class DashboardStatsView(APIView):
             }
         )
         
-@action(detail=True, methods=["post"], url_path="mark-as-read")
-def mark_as_read(self, request, pk=None):
-    notification = self.get_object()
-    notification.is_read = True
-    notification.save()
-    return Response({
-        "message": "Notification marked as read"
-    })

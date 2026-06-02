@@ -14,11 +14,18 @@ from orders.models import Order
 
 from core.emails import send_payment_success_email
 
+from decimal import Decimal
+
+from stripe import SignatureVerificationError
+
+from imports.models import ImportInfo
 
 # Create your views here.
 
 class CreateCheckoutSessionView(APIView):
     permission_classes=[IsAuthenticated]
+    
+    
 
     def post(self, request):
         order_id=request.data.get("order_id") #le frontend envoi et on récupère la commande 
@@ -33,7 +40,7 @@ class CreateCheckoutSessionView(APIView):
             )
         
         if payment_type=="deposit":
-            amount=order.total_price * 0.20
+            amount = order.total_price * Decimal("0.20")
         else:
             amount=order.total_price#on décide combien payer parfois acompte c'est selon le projet en tout cas
             
@@ -53,7 +60,7 @@ class CreateCheckoutSessionView(APIView):
                     "price_data":{
                         "currency":"myr",
                         "product_data":{
-                            "name":f"{order.car.brand} {order.card.model}",
+                            "name":f"{order.car.brand} {order.car.model}",
                         },
                         
                         "unit_amount":amount_cents,
@@ -69,50 +76,70 @@ class CreateCheckoutSessionView(APIView):
         return Response({"checkout_url":session.url})
     
 @csrf_exempt
-def stripe_webhook(request):#c'est la partie la plus important "Le paiement a réussi." via stripe_webhook
-        payload=request.body
-        sig_header=request.META.get("HTTP_STRIPE_SIGNATURE")
-        
-        try:
-            event=stripe.Webhook.construct_event(
-                payload,
-                sig_header,
-                settings.STRIPE_WEBHOOK_SECRET
-            )
-        except ValueError:
-            return HttpResponse(status=400)
-        except stripe.error.SignatureVerificationError:
-            return HttpResponse(status=400)
-        
-        if event["type"]=="checkout.session.completed":
-            session=event["data"]["object"]
+def stripe_webhook(request):
+    payload = request.body
+    sig_header = request.META.get("HTTP_STRIPE_SIGNATURE")
 
-            order_id=session.get("metadata",{}).get("order_id")
-            payment_type=session.get("metadata",{}).get("payment_type")
+    try:
+        event = stripe.Webhook.construct_event(
+            payload,
+            sig_header,
+            settings.STRIPE_WEBHOOK_SECRET
+        )
+        print("WEBHOOK RECU:", event["type"])
+       
+    except ValueError:
+        return HttpResponse("Invalid payload", status=400)
+    except SignatureVerificationError:
+        return HttpResponse("Invalid signature", status=400)
+    except Exception as e:
+        print("STRIPE WEBHOOK ERROR:", str(e))
+        return HttpResponse("Webhook error", status=400)
 
-            try:
-                order=Order.objects.get(id=order_id)
-                order.stripe_payment_id=session.get("payment_intent")
-
-                if payment_type=="deposit":
-                    order.payment_status="deposit_paid"
-                else:
-                    order.payment_status="paid"
-                
-                order.status="confirmed"
-                
-                order.car.is_reserved=True
-                order.car.is_available=False
-                order.car.save()
-
-                order.save()
-                
-                send_payment_success_email(order)
-            
-            except Order.DoesNotExist:
-                pass
-            
+    if event["type"] != "checkout.session.completed":
         return HttpResponse(status=200)
-                
-            
-            
+
+    session = event["data"]["object"]
+
+    metadata = session["metadata"]
+    payment_intent = session["payment_intent"]
+
+    print("SESSION METADATA:", metadata)
+    print("PAYMENT INTENT:", payment_intent)
+
+    order_id = metadata["order_id"]
+    payment_type = metadata["payment_type"]
+
+    try:    
+        order = Order.objects.get(id=order_id)
+    except Order.DoesNotExist:  
+        return HttpResponse(status=200)
+
+    order.stripe_payment_id = payment_intent
+    order.payment_status = "deposit_paid" if payment_type == "deposit" else "paid"
+    order.status = "confirmed"
+
+    car = order.car
+    car.is_reserved = True
+    car.is_available = False
+
+    if payment_type == "full":
+        car.is_sold = True
+
+    
+    
+    car.save()
+
+    try:
+        import_info = ImportInfo.objects.get(car=car)
+        import_info.status = "confirmed"
+        import_info.save(update_fields=["status", "updated_at"])
+        print("IMPORT STATUS UPDATED:", import_info.status)
+    except ImportInfo.DoesNotExist:
+        print("NO IMPORT INFO FOUND FOR CAR:", car.id)
+
+    order.save()
+
+    send_payment_success_email(order)
+
+    return HttpResponse(status=200)

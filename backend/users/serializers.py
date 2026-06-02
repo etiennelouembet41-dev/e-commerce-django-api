@@ -18,6 +18,8 @@ class UserSerializes(serializers.ModelSerializer):
             "gender",
             "is_verified",
             "created_at",
+            "is_staff",
+            "is_superuser",
             
             
             
@@ -50,4 +52,22 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
-    
+
+from django.contrib.auth.password_validation import validate_password
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate_new_password(self, value):
+        validate_password(value)
+        return value
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    new_password = serializers.CharField(write_only=True, min_length=8)

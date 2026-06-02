@@ -16,7 +16,7 @@ Status: {order.status}
 
 Merci pour votre confiance
 
-Le Vikings Cars 
+Le_Vikings_Cars 
 
 """
 
@@ -42,7 +42,7 @@ Total : {order.total_price} $
 
 Nous lançons maintenant le processus d'importation.
 
-Le Vikings Cars
+Le_Vikings_Cars 
 """
 
     send_mail(

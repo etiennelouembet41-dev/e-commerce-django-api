@@ -25,7 +25,7 @@ class CarViewsets(viewsets.ModelViewSet):
         OrderingFilter,
     )
     
-    filterest_fields=(
+    filterset_fields=(
         "brand",
         "origin_country",
         "race_type",

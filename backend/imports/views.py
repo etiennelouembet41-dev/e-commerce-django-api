@@ -42,24 +42,37 @@ class ImportInfoViewsets(viewsets.ModelViewSet):
     )
     
 class ImportTrackingView(APIView):
-    permission_classes=[IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, order_id):
         try:
-            order=Order.objects.select_related(
+            queryset = Order.objects.select_related(
+                "user",
                 "car",
-                "car__import_info",
+                "car__origin_country",
                 "delivery_city",
-            ).get(id=order_id, user=request.user)
+            )
+
+            if request.user.is_staff or request.user.role == "admin":
+                order = queryset.get(id=order_id)
+            else:
+                order = queryset.get(id=order_id, user=request.user)
+
+            import_info = ImportInfo.objects.get(car=order.car)
+
         except Order.DoesNotExist:
             return Response(
-                {"error":"Order not found"},
+                {"error": "Order not found"},
                 status=404
             )
-        
-        import_info=order.car.import_info
-        
-        steps=[
+
+        except ImportInfo.DoesNotExist:
+            return Response(
+                {"error": "Import info not found for this car"},
+                status=404
+            )
+
+        steps = [
             "pending",
             "confirmed",
             "supplier_purchase",
@@ -68,31 +81,28 @@ class ImportTrackingView(APIView):
             "malaysia_customs",
             "local_delivery",
             "delivered",
-            
-            
         ]
-        
-        current_index=steps.index(import_info.status)
 
-        timeline=[]
+        current_index = steps.index(import_info.status)
+
+        timeline = []
 
         for index, step in enumerate(steps):
-            timeline.append(
-                {
-                    "status":step,
-                    "completed": index <= current_index,
-                    "current": index == current_index,
-                    
-                }
-            )
-        
-        return Response(
-            {
-                "order_id":order.id,
-                "car":f"{order.car.brand} {order.car.model}",
-                "delivery_city":order.delivery_city.name,
-                "current_status": import_info.status,
-                "estimated_import_days":import_info.estimated_import_days,
-                "timeline":timeline,
-            }
-        )
+            timeline.append({
+                "status": step,
+                "completed": index <= current_index,
+                "current": index == current_index,
+            })
+
+        return Response({
+            "order_id": order.id,
+            "car": f"{order.car.brand} {order.car.model}",
+            "delivery_city": order.delivery_city.name,
+
+            "order_status": order.status,
+            "payment_status": order.payment_status,
+            "current_status": import_info.status,
+
+            "estimated_import_days": import_info.estimated_import_days,
+            "timeline": timeline,
+        })

@@ -23,12 +23,14 @@ from django.conf.urls.static import static
 
 from rest_framework.routers import DefaultRouter 
 
+from users.views import ChangePasswordView,ForgotPasswordView,ResetPasswordView
 from users.views import UserViewsets,RegisterView,ProfileView
 from addresses.views import AddressViewsets
 from cars.views import CarViewsets,CarImageViewsets
 from core.views import OriginCountryViewsets,MalaisianCityViewsets,NotificationViewSet
 from imports.views import ImportInfoViewsets
 from orders.views import OrderViewsets,OrderItemViewsets
+
 
 router=DefaultRouter()
 
@@ -54,7 +56,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     path('api/token/', TokenObtainPairView.as_view()),
-    path('api/token/refresh', TokenRefreshView.as_view()),
+    path('api/token/refresh/', TokenRefreshView.as_view()),
     
     path('api/auth/register/', RegisterView.as_view()),
     path('api/auth/profile/', ProfileView.as_view()),
@@ -68,6 +70,13 @@ urlpatterns = [
     path('api/imports/', include("imports.urls")),
     
     path('api/ia/', include("ai_assistant.urls")),
+    
+    path("api/auth/change-password/", ChangePasswordView.as_view()),
+    
+    path("api/auth/forgot-password/", ForgotPasswordView.as_view()),
+    path("api/auth/reset-password/", ResetPasswordView.as_view()),
+    
+    
 ]
 
 #MEDIA_URL et MEDIA_ROOT

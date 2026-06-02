@@ -37,8 +37,14 @@ class Order(models.Model):
     )
     
     delivery_city=models.ForeignKey(
-        Address,
+        MalaisianCity,
         on_delete=models.CASCADE,
+        related_name="orders"
+    )
+    
+    delivery_address = models.ForeignKey(
+        Address,
+        on_delete=models.PROTECT,
         related_name="orders"
     )
     
