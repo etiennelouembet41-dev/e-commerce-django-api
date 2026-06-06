@@ -58,6 +58,10 @@ class OrderListSerializer(serializers.ModelSerializer):
         return obj.delivery_city.name
 
     def get_import_status(self, obj):
-        import_info = obj.car.import_info.first()
-        return import_info.status if import_info else None
+        import_info = getattr(obj.car, "import_info", None)
+
+        if import_info:
+            return import_info.status
+
+        return None
 

@@ -1,27 +1,29 @@
-from django.shortcuts import render
-
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter,OrderingFilter
+from .models import Order, OrderItem
+from .serializers import (
+    OrderSerializers,
+    OrderItemSerializers,
+    OrderDetailSerializer,
+    OrderListSerializer,
+)
 
-from .models import Order,OrderItem
-from .serializers import OrderSerializers,OrderItemSerializers, OrderDetailSerializer, OrderListSerializer
-
+from imports.models import ImportInfo
 from core.emails import send_order_confirmation_email
-# Create your views here.
+from core.models import Notification
+
 
 class OrderViewsets(viewsets.ModelViewSet):
-    serializer_class=OrderSerializers
-    permission_classes=[IsAuthenticated]
-    
+    serializer_class = OrderSerializers
+    permission_classes = [IsAuthenticated]
+
     filterset_fields = (
-            "status",
-            "payment_status",
-            "delivery_city",
-            "created_at",
-        )
+        "status",
+        "payment_status",
+        "delivery_city",
+        "created_at",
+    )
 
     search_fields = (
         "user__email",
@@ -36,59 +38,78 @@ class OrderViewsets(viewsets.ModelViewSet):
     )
 
     def get_queryset(self):
-        
         queryset = Order.objects.select_related(
             "user",
             "car",
             "delivery_city",
-            "delivery_address"
+            "delivery_address",
         )
-        
+
         if self.request.user.is_staff or self.request.user.role == "admin":
             return queryset
-        
+
         return queryset.filter(user=self.request.user)
-    
+
     def perform_create(self, serializer):
-        #serializer.save(user=self.request.user) on modifie suite aux mails ajouté 
-        car=serializer.validated_data["car"]
-        delivery_city=serializer.validated_data["delivery_city"]
-        
-        print("DELIVERY CITY:", delivery_city.id, delivery_city.name)
+        car = serializer.validated_data["car"]
+        delivery_city = serializer.validated_data["delivery_city"]
 
-        import_info = car.import_info.first()
+        import_info, created = ImportInfo.objects.get_or_create(
+            car=car,
+            defaults={
+                "estimated_import_cost": 0,
+                "estimated_import_days": 45,
+                "required_documents": (
+                    "Invoice, Export Certificate, Bill of Lading, Customs Form"
+                ),
+                "customs_fees": 0,
+                "status": "pending",
+            },
+        )
 
-        car_price=car.price
-        import_fees=import_info.estimated_import_cost if import_info else 0
-        delivery_fees=delivery_city.delivery_price
-        
-        total_price=car_price+import_fees+delivery_fees
+        car_price = car.price
+        import_fees = import_info.estimated_import_cost
+        delivery_fees = delivery_city.delivery_price
+        total_price = car_price + import_fees + delivery_fees
 
-        order=serializer.save(
-               user=self.request.user,
-               car_price=car_price,
-               import_fees=import_fees,
-               delivery_fees=delivery_fees,
-               total_price=total_price, 
-            )
-        
+        order = serializer.save(
+            user=self.request.user,
+            car_price=car_price,
+            import_fees=import_fees,
+            delivery_fees=delivery_fees,
+            total_price=total_price,
+        )
+
         send_order_confirmation_email(order)
-    
+
+        Notification.objects.create(
+            user=order.user,
+            title="Commande créée",
+            message=f"Votre commande #{order.id} a été créée avec succès.",
+        )
+
     def get_serializer_class(self):
-        
         if self.action == "list":
             return OrderListSerializer
-        
+
         if self.action == "retrieve":
             return OrderDetailSerializer
-        
+
         return OrderSerializers
-        
-        
+
+
 class OrderItemViewsets(viewsets.ModelViewSet):
-    serializer_class=OrderItemSerializers
-    permission_classes=[IsAuthenticated]
-    
+    serializer_class = OrderItemSerializers
+    permission_classes = [IsAuthenticated]
+
     def get_queryset(self):
-        return OrderItem.objects.filter(orders__user=self.request.user)
-    
+        queryset = OrderItem.objects.select_related(
+            "order",
+            "car",
+            "order__user",
+        )
+
+        if self.request.user.is_staff or self.request.user.role == "admin":
+            return queryset
+
+        return queryset.filter(order__user=self.request.user)

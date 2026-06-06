@@ -20,6 +20,8 @@ from stripe import SignatureVerificationError
 
 from imports.models import ImportInfo
 
+from core.models import Notification
+
 # Create your views here.
 
 class CreateCheckoutSessionView(APIView):
@@ -139,6 +141,12 @@ def stripe_webhook(request):
         print("NO IMPORT INFO FOUND FOR CAR:", car.id)
 
     order.save()
+    
+    Notification.objects.create(
+        user=order.user,
+        title="Paiement confirmé",
+        message=f"Votre paiement pour la commande #{order.id} a été confirmé."
+    )
 
     send_payment_success_email(order)
 
