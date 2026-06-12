@@ -94,6 +94,26 @@ class ImportTrackingView(APIView):
                 "current": index == current_index,
             })
 
+        status_remaining_days = {
+            "pending": import_info.estimated_import_days,
+            "confirmed": max(import_info.estimated_import_days - 5, 0),
+            "supplier_purchase": max(import_info.estimated_import_days - 15, 0),
+            "documents_preparation": max(import_info.estimated_import_days - 25, 0),
+            "international_shipping": max(import_info.estimated_import_days - 35, 0),
+            "malaysia_customs": max(import_info.estimated_import_days - 48, 0),
+            "local_delivery": max(import_info.estimated_import_days - 55, 0),
+            "delivered": 0,
+        }
+
+        remaining_days = status_remaining_days.get(
+            import_info.status,
+            import_info.estimated_import_days
+        )
+
+        progress_percent = int(
+            (current_index / (len(steps) - 1)) * 100
+        )
+
         return Response({
             "order_id": order.id,
             "car": f"{order.car.brand} {order.car.model}",
@@ -104,5 +124,8 @@ class ImportTrackingView(APIView):
             "current_status": import_info.status,
 
             "estimated_import_days": import_info.estimated_import_days,
+            "remaining_days": remaining_days,
+            "progress_percent": progress_percent,
+
             "timeline": timeline,
         })

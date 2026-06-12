@@ -8,6 +8,7 @@ from addresses.models import Address
 class Order(models.Model):
     OREDER_STATUS_CHOICES=(
         ("pending","Pending"),
+        ("validated", "Validée par l'administration"),
         ("confirmed","Confirmed"),
         ("processing","Processing"),
         ("importing","import in progress"),
@@ -105,6 +106,35 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.car} x {self.quantity}"
+    
+    
+
+class OrderStatusHistory(models.Model):
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name="status_history"
+    )
+
+    old_status = models.CharField(max_length=50, blank=True, null=True)
+    new_status = models.CharField(max_length=50)
+
+    changed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    note = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Order #{self.order.id}: {self.old_status} → {self.new_status}"
     
     
     

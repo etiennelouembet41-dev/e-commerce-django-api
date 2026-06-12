@@ -1,19 +1,19 @@
 from django.contrib import admin
-from .models import OriginCountry,MalaisianCity
+from .models import OriginCountry,MalaisianCity,AuditLog
 # Register your models here.
  
  
 @admin.register(OriginCountry)
 class OriginCountryAdmin(admin.ModelAdmin):
     list_display=(
-        "name",
-        "code",
-        "is_activate",
+        
+        "country",
+        "is_active",
         "created_at",
     )
     
     list_filter=(
-        "is_activate",
+        "is_active",
     )
     
     search_fields=( 
@@ -37,3 +37,10 @@ class MalaisianCityAdmin(admin.ModelAdmin):
     search_fields=(
         "name",
     )
+
+@admin.register(AuditLog)
+class AuditLogAdmin(admin.ModelAdmin):
+    list_display = ("action", "user", "created_at")
+    list_filter = ("action", "created_at")
+    search_fields = ("message", "user__email")
+    readonly_fields = ("user", "action", "message", "created_at")

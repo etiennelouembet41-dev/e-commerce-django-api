@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django_countries.fields import CountryField
+from django.conf import settings
 # Create your models here.
 
 class User(AbstractUser):
@@ -40,9 +42,16 @@ class User(AbstractUser):
         default="customer",
     )
     
-    gender=models.CharField(
+    gender = models.CharField(
         max_length=30,
-        choices=GENDER_CHOICES,     
+        choices=GENDER_CHOICES,
+        blank=True,
+        null=True,
+    )
+    
+    nationality = CountryField(
+        blank=False,
+        null=False
     )
     
     is_verified=models.BooleanField(default=False)

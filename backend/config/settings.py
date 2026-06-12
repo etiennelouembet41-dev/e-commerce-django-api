@@ -38,6 +38,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -55,12 +57,18 @@ INSTALLED_APPS = [
     'orders',
     'addresses',
     'payments',
+    "import_predictor",
+    "documents",
+    "invoices",
+    
     
     #nos tiers
     'rest_framework',
     'crispy_forms',
     'corsheaders',
     'django_filters',
+    "django_countries",
+    "channels",
 ]
 
 MIDDLEWARE = [
@@ -209,3 +217,13 @@ EMAIL_USE_TLS=config("EMAIL_USE_TLS", default=True, cast=bool)
 EMAIL_HOST_USER=config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD=config("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL=config("DEFAULT_FROM_EMAIL")
+
+FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:5173")
+
+ASGI_APPLICATION = "config.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}

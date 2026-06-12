@@ -12,6 +12,7 @@ class CarAdmin(admin.ModelAdmin):
     inlines=[CarImageInline]
     
     list_display = (
+        "id",
         "brand",
         "model",
         "year",
@@ -25,6 +26,7 @@ class CarAdmin(admin.ModelAdmin):
     )
     
     list_filter = (
+        
         "brand",
         "origin_country",
         "race_type",

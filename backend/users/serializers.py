@@ -1,10 +1,15 @@
 from rest_framework import serializers 
 from .models import User
 
+from django_countries.serializer_fields import CountryField
+
 class UserSerializes(serializers.ModelSerializer):
+
+    nationality = CountryField(name_only=False)
+
     class Meta:
-        model=User
-        fields=(
+        model = User
+        fields = (
             "id",
             "email",
             "username",
@@ -16,16 +21,22 @@ class UserSerializes(serializers.ModelSerializer):
             "city",
             "role",
             "gender",
+            "nationality",
             "is_verified",
             "created_at",
             "is_staff",
             "is_superuser",
-            
-            
-            
         )
-        
-        read_on_fields=("id", "role", "is_verified", "created_at",)
+
+        read_only_fields = (
+            "id",
+            "email",
+            "role",
+            "is_verified",
+            "created_at",
+            "is_staff",
+            "is_superuser",
+        )
         
     
     
@@ -43,13 +54,24 @@ class RegisterSerializer(serializers.ModelSerializer):
             "last_name",
             "phone_number",
             "password",
+            "gender",
+            "nationality",
             
         )
+    
+    def validate_nationality(self, value):
+        if not value:
+            raise serializers.ValidationError(
+                "La nationalité est obligatoire."
+            )
+        return value
         
     def create(self, validated_data):
         password=validated_data.pop("password")
         user=User(**validated_data)
         user.set_password(password)
+        user.is_active = False
+        user.is_verified = False
         user.save()
         return user
 

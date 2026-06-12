@@ -13,6 +13,8 @@ class CustomerUserAdmin(UserAdmin):
         "role",
         "is_staff",
         "is_active",
+        "gender",
+        "nationality",
     )
     
     list_filter=(

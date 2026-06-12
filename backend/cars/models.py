@@ -54,7 +54,7 @@ class Car(models.Model):
 
     origin_country=models.ForeignKey(
         OriginCountry,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="cars"
     )
     
@@ -101,7 +101,12 @@ class Car(models.Model):
     updated_at=models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        ordering=["-created_at"]
+        ordering = [
+            "-is_available",
+            "is_reserved",
+            "is_sold",
+            "-created_at",
+        ]
 
     def __str__(self):
         return f"{self.brand} {self.model} ({self.year})"

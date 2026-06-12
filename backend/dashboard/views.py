@@ -6,7 +6,7 @@ from django.db.models.functions import TruncMonth
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
-from rest_framework.decorators import action
+
 
 from orders.models import Order
 from cars.models import Car
@@ -83,7 +83,7 @@ class DashboardStatsView(APIView):
         )
         
         sales_by_origin_country=(
-            Order.objects.values("car__origin_country__name")
+            Order.objects.values("car__origin_country__country")
             .annotate(total_orders=Count("id"), revenue=Sum("total_price"))
             .order_by("-total_orders")
         )

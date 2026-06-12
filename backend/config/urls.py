@@ -24,12 +24,13 @@ from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter 
 
 from users.views import ChangePasswordView,ForgotPasswordView,ResetPasswordView
-from users.views import UserViewsets,RegisterView,ProfileView
+from users.views import UserViewsets,RegisterView,ProfileView,CountryListView,ActivateAccountView,ResendActivationEmailView
 from addresses.views import AddressViewsets
 from cars.views import CarViewsets,CarImageViewsets
-from core.views import OriginCountryViewsets,MalaisianCityViewsets,NotificationViewSet
+from core.views import OriginCountryViewsets,MalaisianCityViewsets,NotificationViewSet,AuditLogViewSet
 from imports.views import ImportInfoViewsets
 from orders.views import OrderViewsets,OrderItemViewsets
+from documents.views import DocumentViewSet
 
 
 router=DefaultRouter()
@@ -38,12 +39,15 @@ router.register(r'users',UserViewsets)
 router.register(r'addresses', AddressViewsets, basename='addresses')
 router.register(r'cars',CarViewsets)   
 router.register(r'cars_images',CarImageViewsets)
-router.register(r'core_origincountry',OriginCountryViewsets)
+router.register(r'origin-countries',OriginCountryViewsets)
 router.register(r'core_malaisian',MalaisianCityViewsets)
 router.register(r'imports',ImportInfoViewsets)
 router.register(r'orders_order',OrderViewsets, basename='order')
 router.register(r'orders_orderitem',OrderItemViewsets,basename='orderitem')
 router.register(r'notifications', NotificationViewSet, basename='notifications')
+router.register(r"audit-logs", AuditLogViewSet, basename="audit-logs")
+router.register("documents",DocumentViewSet,basename="documents")
+
 
 #pour fournir les endpoints d'authentification JWT de Django REST Framework SimpleJWT
 from rest_framework_simplejwt.views import (
@@ -76,6 +80,13 @@ urlpatterns = [
     path("api/auth/forgot-password/", ForgotPasswordView.as_view()),
     path("api/auth/reset-password/", ResetPasswordView.as_view()),
     
+    path("api/countries-list/", CountryListView.as_view()),
+    
+    path("api/auth/activate/<uidb64>/<token>/",ActivateAccountView.as_view(),name="activate-account"),
+    
+    path("api/auth/resend-activation/",ResendActivationEmailView.as_view()),
+    
+    path("api/import-predictor/", include("import_predictor.urls")),
     
 ]
 
